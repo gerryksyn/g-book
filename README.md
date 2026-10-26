@@ -109,6 +109,9 @@ Losing it means every existing install has to be uninstalled and replaced by han
 
 `local.properties` is git-ignored too — it holds a machine-specific SDK path.
 
+Shipping a version — version bump, signing, checksums, the site update and the GitHub
+release — is documented step by step in [RELEASING.md](RELEASING.md).
+
 ## Project structure
 
 ```
@@ -131,6 +134,7 @@ Losing it means every existing install has to be uninstalled and replaced by han
 │       │       └── theme/               AMOLED theme, motion
 │       └── test/java/id/gerry/gbook/    unit tests
 ├── docs/                       the landing page, served by GitHub Pages
+├── RELEASING.md                how to cut and publish a version
 ├── build.gradle.kts
 ├── settings.gradle.kts
 └── gradle.properties
