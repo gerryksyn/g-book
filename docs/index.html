@@ -302,12 +302,26 @@
     text-transform:uppercase;color:var(--accent);margin-bottom:.45rem;
   }
   .contact-mail{
-    font-size:clamp(1.05rem,2.4vw,1.5rem);font-weight:700;letter-spacing:-.02em;
-    text-decoration:none;color:var(--ink);word-break:break-all;
-    border-bottom:2px solid rgba(201,169,255,.38);padding-bottom:2px;
+    display:block;font-size:clamp(1.05rem,2.4vw,1.5rem);font-weight:700;
+    letter-spacing:-.02em;color:var(--ink);word-break:break-all;
+    -webkit-user-select:all;user-select:all;
+  }
+  .contact-actions{display:flex;flex-direction:column;gap:.6rem;align-items:flex-start}
+  .contact-alt{
+    font-size:.84em;color:var(--muted);text-decoration:none;
+    border-bottom:1px dashed rgba(201,169,255,.42);padding-bottom:1px;
     transition:color .18s,border-color .18s;
   }
-  .contact-mail:hover{color:var(--accent);border-bottom-color:var(--accent)}
+  .contact-alt:hover{color:var(--accent);border-bottom-color:var(--accent)}
+  button.btn{font-family:inherit;cursor:pointer}
+  .btn.copied{
+    background:linear-gradient(180deg,#D8F5E2,#A9E7C0);color:#0b2413;
+    box-shadow:0 10px 30px -12px rgba(169,231,192,.6),inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  .sr-only{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
+  }
 
   /* footer */
   footer{
@@ -675,13 +689,17 @@
       <div class="contact-card reveal">
         <div>
           <span class="contact-label">Email</span>
-          <a class="contact-mail" href="mailto:kisyonogerry@gmail.com?subject=G-Book">kisyonogerry@gmail.com</a>
+          <span class="contact-mail" id="contactAddress">kisyonogerry@gmail.com</span>
         </div>
-        <a class="btn btn-primary" href="mailto:kisyonogerry@gmail.com?subject=G-Book">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7.2 8.5 5.8 8.5-5.8"/></svg>
-          Write to me
-        </a>
+        <div class="contact-actions">
+          <button type="button" class="btn btn-primary" id="copyEmail" data-email="kisyonogerry@gmail.com">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.4"/><path d="M15 5.4A2.4 2.4 0 0 0 12.6 3H5.4A2.4 2.4 0 0 0 3 5.4v7.2A2.4 2.4 0 0 0 5.4 15"/></svg>
+            <span id="copyLabel">Copy address</span>
+          </button>
+          <a class="contact-alt" href="mailto:kisyonogerry@gmail.com?subject=G-Book">or open your mail app</a>
+        </div>
       </div>
+      <span class="sr-only" id="copyStatus" role="status" aria-live="polite"></span>
     </section>
 
   </main>
@@ -741,6 +759,55 @@
       if (e.target.tagName === "A" && navLinks.classList.contains("open")) {
         navLinks.classList.remove("open");
         menuBtn.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  /* ---- copy email ---- */
+  var copyBtn = document.getElementById("copyEmail");
+  var copyLabel = document.getElementById("copyLabel");
+  var copyStatus = document.getElementById("copyStatus");
+  if (copyBtn && copyLabel) {
+    var resetTimer = null;
+    var flash = function (msg, ok) {
+      copyLabel.textContent = msg;
+      copyBtn.classList.toggle("copied", !!ok);
+      if (copyStatus) {
+        copyStatus.textContent = ok
+          ? "Email address copied to clipboard"
+          : "Could not copy automatically. Select the address and copy it.";
+      }
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(function () {
+        copyLabel.textContent = "Copy address";
+        copyBtn.classList.remove("copied");
+      }, 2200);
+    };
+
+    copyBtn.addEventListener("click", function () {
+      var email = copyBtn.getAttribute("data-email");
+
+      var legacyCopy = function () {
+        var field = document.createElement("textarea");
+        field.value = email;
+        field.setAttribute("readonly", "");
+        field.style.position = "fixed";
+        field.style.top = "-1000px";
+        field.style.opacity = "0";
+        document.body.appendChild(field);
+        field.select();
+        var ok = false;
+        try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+        document.body.removeChild(field);
+        flash(ok ? "Copied" : "Select and copy", ok);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(email).then(function () {
+          flash("Copied", true);
+        }).catch(legacyCopy);
+      } else {
+        legacyCopy();
       }
     });
   }
