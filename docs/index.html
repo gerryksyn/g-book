@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>G-Book: an ebook reader that reads to you</title>
-<meta name="description" content="G-Book is a low-vision-first Android ebook reader with built-in text-to-speech, sentence-level highlighting, and type you can actually size. EPUB and PDF. Free, offline, no accounts.">
+<title>G-Book: an Android ebook reader that reads to you</title>
+<meta name="description" content="G-Book is an Android ebook reader with auto-playing text to speech, sentence by sentence highlighting and an interface that does not look a decade old. Set the type as big as your eyes need, up to 44sp. EPUB and PDF, free and offline, no account.">
 <meta name="theme-color" content="#050507">
 <link rel="icon" href="assets/icon-64.png" sizes="64x64">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <meta property="og:type" content="website">
-<meta property="og:title" content="G-Book: an ebook reader that reads to you">
-<meta property="og:description" content="Built for low vision. Big type, real text-to-speech, sentence highlighting, EPUB + PDF. Free and offline.">
+<meta property="og:title" content="G-Book: an Android ebook reader that reads to you">
+<meta property="og:description" content="Auto-playing text to speech, a sentence highlight that follows the voice, and type you can size to 44sp. EPUB and PDF, free and offline, no account.">
 <meta property="og:image" content="assets/icon-512.png">
 <script>document.documentElement.className += " js";</script>
 <style>
@@ -173,7 +173,8 @@
 
   /* story */
   .story{
-    display:grid;grid-template-columns:auto 1fr;gap:clamp(1.5rem,4vw,3rem);align-items:center;
+    display:grid;grid-template-columns:auto 1fr;gap:clamp(1.5rem,4vw,3rem);align-items:start;
+    max-width:1000px;margin-inline:auto;
     border:1px solid var(--line);border-radius:calc(var(--radius) + 6px);
     background:linear-gradient(150deg,rgba(201,169,255,.075),rgba(255,255,255,.018) 45%,transparent);
     padding:clamp(1.6rem,3.5vw,2.8rem);
@@ -186,6 +187,12 @@
     border:2px solid rgba(201,169,255,.4);box-shadow:0 0 0 6px rgba(201,169,255,.07);
   }
   .story blockquote{margin:0;font-size:clamp(1.05rem,2vw,1.32rem);line-height:1.55;font-weight:500;letter-spacing:-.01em}
+  .story-copy .kicker{margin-bottom:.85rem}
+  .story-copy p{color:var(--muted);font-size:.97em;margin-top:.85rem;max-width:62ch}
+  .story-copy p:first-of-type{
+    color:var(--ink);font-size:clamp(1.05rem,1.9vw,1.2rem);
+    font-weight:500;line-height:1.5;letter-spacing:-.01em;margin-top:0;
+  }
   .story cite{display:block;margin-top:1rem;font-style:normal;font-size:.86em;color:var(--dim);font-weight:600}
 
   /* feature grid */
@@ -415,9 +422,9 @@
         <span class="eyebrow"><span class="dot"></span>Android &middot; Kotlin &middot; Compose</span>
         <h1>An ebook reader that <em>reads to you</em>.</h1>
         <p class="lede">
-          G-Book was built for low vision, from the first line of code. Type you can size up to 44sp.
-          Real text-to-speech with sentence-by-sentence highlighting. EPUB and PDF. No accounts,
-          no ads, no network required to read.
+          Auto-playing text to speech, a highlight that follows the voice, and an interface that does
+          not look a decade old. Set the type as big as your eyes need, up to 44sp. EPUB and PDF,
+          free, offline, and it never asks for an account.
         </p>
         <div class="cta">
           <a class="btn btn-primary" href="assets/apk/G-Book-v0.6.2.apk" download>
@@ -448,11 +455,11 @@
     <section style="padding-top:0">
       <div class="story reveal">
         <img src="assets/gerry.webp?v=3" width="118" height="118" alt="Gerry, the developer of G-Book.">
-        <div>
-          <blockquote>
-            &ldquo;I have low vision, so I built the reader I actually needed. Then I kept
-            rebuilding it every time something got in the way of the words.&rdquo;
-          </blockquote>
+        <div class="story-copy">
+          <span class="kicker">Why it exists</span>
+          <p>I have low vision, so physical books stopped being an option for me a long time ago. I went looking for an ebook reader that could read out loud.</p>
+          <p>Every one I tried made me choose. The ones with the features I needed looked like they had not been redesigned since 2012. The ones that looked beautiful were missing half of what I wanted, or buried it three menus deep.</p>
+          <p>So I built the one I was looking for. It keeps reading with the screen off, the highlight follows the sentence being spoken, and the type goes to 44sp without the layout falling apart. None of that is an accessibility mode bolted on at the end. It is just how the reader works, which is why it suits people who never touch an accessibility setting.</p>
           <cite>Gerry, maker of G-Book</cite>
         </div>
       </div>
@@ -461,8 +468,8 @@
     <section id="features">
       <div class="sec-head reveal">
         <span class="kicker">Features</span>
-        <h2>Everything that matters when the text has to be readable</h2>
-        <p>Not a feature list for a store page. These are the things that were fixed, one version at a time, because they got in the way of reading.</p>
+        <h2>Everything that matters when you just want to read</h2>
+        <p>Not a list written for a store page. Every one of these exists because something got in the way of reading, and it got fixed.</p>
       </div>
 
       <div class="grid">
@@ -555,8 +562,8 @@
     <section id="accessibility">
       <div class="sec-head reveal">
         <span class="kicker">Accessibility</span>
-        <h2>Built from the eyes outward</h2>
-        <p>Low vision is not a settings toggle you add at the end. It shapes how the reader behaves: what is tappable, what is hidden, and how big the target is.</p>
+        <h2>Built for one pair of eyes, useful for everyone</h2>
+        <p>G-Book started as a low vision project, and that is why the reading surface is not an afterthought. The text scales, the contrast is real, and the controls are big enough to hit without aiming. You do not have to need any of that to be glad it is there.</p>
       </div>
       <div class="a11y-grid">
         <div class="a11y-item reveal">

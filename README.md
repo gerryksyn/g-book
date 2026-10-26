@@ -1,6 +1,7 @@
 # G-Book
 
-An Android ebook reader that reads to you. Built for low vision, from the first line of code.
+An Android ebook reader that reads to you. Auto-playing text to speech, a highlight that
+follows the voice, and an interface that does not look a decade old.
 
 **Landing page:** https://gerryksyn.github.io/g-book/
 **Download:** [G-Book-v0.6.2.apk](docs/assets/apk/G-Book-v0.6.2.apk) · 18.6 MB · Android 8.0+
@@ -11,12 +12,26 @@ An Android ebook reader that reads to you. Built for low vision, from the first 
 
 ## What it is
 
-G-Book is a native Android reading app with text-to-speech built in. Large type, real
-sentence-level highlighting, EPUB and PDF support, and nothing standing between you and
-the words.
+G-Book is a native Android reading app with auto-playing text to speech built in. The
+highlight follows the sentence being spoken, the type scales to 44sp, EPUB and PDF both
+open, and the interface is meant to look like something built this decade.
 
-I have low vision, so this is the reader I actually needed. Then I kept rebuilding every
-time something got in the way of the words.
+It is for anyone who would rather listen than squint, and for the readers who need large
+type to read at all. Those are the same app, not two of them.
+
+## Why it exists
+
+I have low vision, so physical books stopped being an option for me a long time ago. I went
+looking for an ebook reader that could read out loud.
+
+Every one I tried made me choose. The ones with the features I needed looked like they had
+not been redesigned since 2012. The ones that looked beautiful were missing half of what I
+wanted, or buried it three menus deep.
+
+So I built the one I was looking for. It keeps reading with the screen off, the highlight
+follows the voice, and the type goes to 44sp without the layout falling apart. None of that
+is an accessibility mode bolted on at the end. It is just how the reader works, which is
+why it suits people who never touch an accessibility setting.
 
 ## Features
 
@@ -41,7 +56,7 @@ time something got in the way of the words.
 
 ## Accessibility
 
-The reason the app exists, so it gets its own section:
+This is where G-Book started, so it gets its own section:
 
 - Volume keys step sentence-by-sentence in full-screen reading instead of changing volume.
 - A tap hides all chrome so the page is only text; nothing overlaps the words.
