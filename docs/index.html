@@ -366,6 +366,12 @@
     .story{grid-template-columns:1fr;text-align:left}
     .story img{width:88px;height:88px}
   }
+  @media (max-width:560px){
+    /* the splash is a logo on black, so at full size it would push the
+       headline below the fold on a phone. keep it as a brand mark instead */
+    .phone{width:min(196px,52vw)}
+    .phone-wrap::after{filter:blur(32px)}
+  }
   @media (max-width:900px){
     .nav-links{
       position:absolute;top:100%;left:0;right:0;
@@ -446,8 +452,8 @@
 
       <div class="phone-wrap">
         <div class="phone">
-          <img src="assets/shots/reader.webp?v=2" width="700" height="1556"
-               alt="G-Book reading screen: large white text on pure black, with the current sentence highlighted in light purple and a play button below.">
+          <img src="assets/shots/splash.webp" width="700" height="1556"
+               alt="G-Book splash screen: the G-Book logo, a purple outlined G with an open book inside it, on a black screen.">
         </div>
       </div>
     </section>
