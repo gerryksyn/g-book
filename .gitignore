@@ -23,6 +23,8 @@ captures/
 .externalNativeBuild/
 .cxx/
 build/
+# ---- signing material — must never be committed ----
+keystore.properties
 *.jks
 *.keystore
 

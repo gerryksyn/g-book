@@ -35,7 +35,7 @@ Keep paths relative (`assets/...`, not `/assets/...`) so the site keeps working 
 
 ## Replacing the APK on a new release
 
-1. Drop the new `G-Book-vX.Y.Z-debug.apk` into `assets/apk/` and update `SHA256SUMS.txt`.
+1. Drop the new `G-Book-vX.Y.Z.apk` into `assets/apk/` and update `SHA256SUMS.txt`.
 2. Update the version strings in `index.html` (hero chips, download card, SHA-256, changelog).
 3. Update the table in the root `README.md`.
 4. Commit and push.

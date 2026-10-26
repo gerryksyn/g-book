@@ -1,1 +1,1 @@
-d17f25f367662c17a5d282fcb9a2a8e70cb6bc9b0f90ad3a1b17796fab4b713d  G-Book-v0.6.2-debug.apk
+9ea237097ee7c039803adbb68ef9926b93ebef0191539c1dbe4ec60ca9ddf264  G-Book-v0.6.2.apk

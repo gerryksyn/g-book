@@ -377,7 +377,7 @@
           no ads, no network required to read.
         </p>
         <div class="cta">
-          <a class="btn btn-primary" href="assets/apk/G-Book-v0.6.2-debug.apk" download>
+          <a class="btn btn-primary" href="assets/apk/G-Book-v0.6.2.apk" download>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16"/></svg>
             Download APK &middot; v0.6.2
           </a>
@@ -389,7 +389,7 @@
         <div class="meta">
           <span class="chip"><b>v0.6.2</b> &middot; code 21</span>
           <span class="chip">Android <b>8.0+</b></span>
-          <span class="chip"><b>24 MB</b> &middot; offline</span>
+          <span class="chip"><b>18.6 MB</b> &middot; offline</span>
           <span class="chip">EPUB &middot; PDF</span>
         </div>
       </div>
@@ -570,19 +570,19 @@
             <b>v0.6.2</b>
             <span style="color:var(--muted);font-size:.9em">versionCode 21</span>
           </div>
-          <a class="btn btn-primary" href="assets/apk/G-Book-v0.6.2-debug.apk" download>
+          <a class="btn btn-primary" href="assets/apk/G-Book-v0.6.2.apk" download>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16"/></svg>
-            Download G-Book-v0.6.2-debug.apk
+            Download G-Book-v0.6.2.apk
           </a>
           <ul class="specs">
-            <li><span>File size</span><b>24.2 MB</b></li>
+            <li><span>File size</span><b>18.6 MB</b></li>
             <li><span>Requires</span><b>Android 8.0 (API 26) or newer</b></li>
             <li><span>Targets</span><b>Android 14 (API 34)</b></li>
             <li><span>Package</span><b>id.gerry.gbook</b></li>
           </ul>
           <div class="sha">
             SHA-256
-            <code>d17f25f367662c17a5d282fcb9a2a8e70cb6bc9b0f90ad3a1b17796fab4b713d</code>
+            <code>9ea237097ee7c039803adbb68ef9926b93ebef0191539c1dbe4ec60ca9ddf264</code>
           </div>
         </div>
         <div>
@@ -592,9 +592,14 @@
             <li><b>Open the file</b> and confirm. G-Book appears in your launcher as a black icon with a lavender G.</li>
           </ol>
           <p class="note">
-            The APK is debug-signed and distributed outside any app store, which is why Android shows
-            the warning. Verify the SHA-256 above if you want to be certain the file arrived intact.
-            G-Book asks for no account and no internet permission to read.
+            Signed with a private release key rather than a debug key, but still distributed outside an
+            app store &mdash; that is why Android shows the warning. Verify the SHA-256 above if you want
+            to be certain the file arrived intact. G-Book asks for no account and no internet permission
+            to read.
+            <br><br>
+            <b>Upgrading from the earlier debug build?</b> The signing key changed, so Android will refuse
+            to install over it. Back up your progress from Stats, uninstall the old copy, then install
+            this one and restore.
           </p>
         </div>
       </div>

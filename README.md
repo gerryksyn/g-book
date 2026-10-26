@@ -3,7 +3,7 @@
 An Android ebook reader that reads to you. Built for low vision, from the first line of code.
 
 **Landing page:** https://gerryksyn.github.io/g-book/
-**Download:** [G-Book-v0.6.2-debug.apk](docs/assets/apk/G-Book-v0.6.2-debug.apk) · 24.2 MB · Android 8.0+
+**Download:** [G-Book-v0.6.2.apk](docs/assets/apk/G-Book-v0.6.2.apk) · 18.6 MB · Android 8.0+
 
 <img src="docs/assets/shots/library.webp" width="200" alt="G-Book library screen"> <img src="docs/assets/shots/reader.webp" width="200" alt="G-Book reader with sentence highlight"> <img src="docs/assets/shots/stats.webp" width="200" alt="G-Book stats screen"> <img src="docs/assets/shots/share.webp" width="200" alt="G-Book share card">
 
@@ -58,16 +58,21 @@ The reason the app exists, so it gets its own section:
 | Requires | Android 8.0 (API 26) or newer |
 | Targets | Android 14 (API 34) |
 | Package | `id.gerry.gbook` |
-| Size | 24.2 MB |
-| SHA-256 | `d17f25f367662c17a5d282fcb9a2a8e70cb6bc9b0f90ad3a1b17796fab4b713d` |
+| Size | 18.6 MB |
+| SHA-256 | `9ea237097ee7c039803adbb68ef9926b93ebef0191539c1dbe4ec60ca9ddf264` |
 
-The APK is **debug-signed** and distributed outside any app store, so Android will ask
-you to allow installs from this source. Verify the SHA-256 if you want to be sure the
-file arrived intact. G-Book needs no account and no network to read.
+The APK is signed with a **private release key**, not a debug key, but it is still
+distributed outside any app store — so Android will ask you to allow installs from this
+source. Verify the SHA-256 if you want to be sure the file arrived intact. G-Book needs
+no account and no network to read.
+
+> **Upgrading from the earlier debug build?** The signing key changed, so Android will
+> refuse to install over it. Back up your progress from Stats, uninstall the old copy,
+> install this one, then restore.
 
 ## Build from source
 
-Requires **JDK 17** and the Android SDK (compileSdk 34).
+Requires **JDK 17** (JDK 21 works too) and the Android SDK with platform 34.
 
 ```bash
 git clone https://github.com/gerryksyn/g-book.git
@@ -79,9 +84,30 @@ echo "sdk.dir=$ANDROID_HOME" > local.properties
 ./gradlew clean :app:testDebugUnitTest :app:assembleDebug
 ```
 
-The APK lands in `app/build/outputs/apk/debug/app-debug.apk`.
+The debug APK lands in `app/build/outputs/apk/debug/app-debug.apk`.
 
-`local.properties` is git-ignored on purpose — it holds a machine-specific SDK path.
+For a release build:
+
+```bash
+./gradlew :app:assembleRelease
+# → app/build/outputs/apk/release/app-release.apk
+```
+
+Release signing reads `keystore.properties` from the repo root, which is **git-ignored**:
+
+```properties
+storeFile=/absolute/path/to/gbook-release.jks
+storePassword=…
+keyAlias=gbook
+keyPassword=…
+```
+
+Without that file the release build still compiles, just unsigned — so a fresh clone
+never breaks. The keystore itself is never in this repository, and it should never be:
+anyone holding it can publish an update that Android will install over the real app.
+Losing it means every existing install has to be uninstalled and replaced by hand.
+
+`local.properties` is git-ignored too — it holds a machine-specific SDK path.
 
 ## Project structure
 
@@ -141,7 +167,8 @@ synchronised chapter identity.
 
 ## Known limitations
 
-- Debug-signed build. No release keystore yet, so no Play Store distribution.
+- Signed with a self-generated release key, not a Play Store key, so no store distribution.
+- Installing this build over an earlier debug-signed one requires an uninstall first.
 - EPUB and PDF only — no MOBI, AZW3 or CBZ.
 - TTS quality and available voices depend on the voices installed on the device.
 - No sync between devices; progress lives on the phone and in CSV backups.
