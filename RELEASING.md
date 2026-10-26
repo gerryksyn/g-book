@@ -11,7 +11,7 @@ Every command here was actually run to produce v0.6.2.
 |---|---|
 | JDK 17+ | `C:/Program Files/Android/Android Studio/jbr` (JDK 21 works) |
 | Android SDK | `%LOCALAPPDATA%/Android/Sdk` |
-| GitHub CLI | `C:/Program Files/GitHub CLI/gh.exe` — **not on PATH in Git Bash**, use the full path |
+| GitHub CLI | `C:/Program Files/GitHub CLI/gh.exe`. **Not on PATH in Git Bash**, so use the full path |
 | Release keystore | outside the repo, e.g. `~/keystores/gbook-release.jks` |
 
 Open a fresh terminal and set these once per session:
@@ -31,7 +31,7 @@ keyAlias=gbook
 keyPassword=…
 ```
 
-If that file is missing the build still succeeds, but the APK comes out **unsigned** — check the
+If that file is missing the build still succeeds, but the APK comes out **unsigned**. Check the
 signature in step 3 before you publish anything.
 
 ---
@@ -59,7 +59,7 @@ faster. Don't assume it's hung.
 
 Output: `app/build/outputs/apk/release/app-release.apk`
 
-## 3. Verify the artifact — do not skip this
+## 3. Verify the artifact (do not skip this)
 
 ```bash
 APK=app/build/outputs/apk/release/app-release.apk
@@ -76,7 +76,7 @@ stat -c "%s bytes" "$APK"
 ```
 
 The certificate DN must say `CN=Gerry`. If it says `CN=Android Debug`, the signing config didn't
-load — fix that before publishing, because a debug-signed build cannot be upgraded from.
+load. Fix that before publishing, because a debug-signed build cannot be upgraded from.
 
 ## 4. Update the site
 
@@ -114,7 +114,7 @@ git commit -m "G-Book vX.Y.Z"
 git push origin main
 ```
 
-If the push times out, run it in the background — the repo is ~55 MB and a cold push can take
+If the push times out, run it in the background. The repo is ~55 MB and a cold push can take
 longer than a foreground timeout.
 
 ## 6. Tag and publish the release
@@ -129,7 +129,7 @@ longer than a foreground timeout.
 ```
 
 The release notes should always state: what changed, how to install, the SHA-256, the signing
-identity, and — if the key changed — that an uninstall is required.
+identity, plus a note that an uninstall is required if the key changed.
 
 ## 7. Verify what you actually published
 
@@ -179,7 +179,7 @@ none of it proves it *works*.
 | "App not installed" on a phone that already has G-Book | Signature mismatch. The installed copy was signed with a different key. Back up progress, uninstall, reinstall, restore. |
 | Release APK is unsigned | `keystore.properties` missing or has a bad path. Check `storeFile`. |
 | `compileSdk 34 not found` | AGP can download it if SDK licences are accepted; otherwise install platform 34 in Android Studio's SDK Manager. |
-| Build sits for 30+ minutes with no output | Normal on a cold cache — Compose compilation. Check `app/build/intermediates` is growing before assuming a hang. |
+| Build sits for 30+ minutes with no output | Normal on a cold cache, since Compose compilation is slow. Check `app/build/intermediates` is growing before assuming a hang. |
 | Page serves the wrong content, or a Jekyll-generated title like `G-Book \| g-book` | Pages source is wrong, or the build predates a config change. `PUT` the source, then `POST repos/{owner}/{repo}/pages/builds` to force a rebuild. |
 | `gh: command not found` | It is not on PATH. Use `"/c/Program Files/GitHub CLI/gh.exe"`. |
 | Push times out | Run it in the background; ~55 MB repo. |

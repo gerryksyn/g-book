@@ -15,7 +15,7 @@ G-Book is a native Android reading app with text-to-speech built in. Large type,
 sentence-level highlighting, EPUB and PDF support, and nothing standing between you and
 the words.
 
-I have low vision, so this is the reader I actually needed — then kept rebuilding every
+I have low vision, so this is the reader I actually needed. Then I kept rebuilding every
 time something got in the way of the words.
 
 ## Features
@@ -48,7 +48,7 @@ The reason the app exists, so it gets its own section:
 - The reader keeps its own locked type scale, so large sizes don't collapse the layout
   into clipped lines.
 - Resumes on the exact sentence it left, scrolled into view.
-- Everything is real scalable type — nothing is a picture of text.
+- Everything is real scalable type. Nothing is a picture of text.
 
 ## Download
 
@@ -62,7 +62,7 @@ The reason the app exists, so it gets its own section:
 | SHA-256 | `9ea237097ee7c039803adbb68ef9926b93ebef0191539c1dbe4ec60ca9ddf264` |
 
 The APK is signed with a **private release key**, not a debug key, but it is still
-distributed outside any app store — so Android will ask you to allow installs from this
+distributed outside any app store, so Android will ask you to allow installs from this
 source. Verify the SHA-256 if you want to be sure the file arrived intact. G-Book needs
 no account and no network to read.
 
@@ -102,15 +102,15 @@ keyAlias=gbook
 keyPassword=…
 ```
 
-Without that file the release build still compiles, just unsigned — so a fresh clone
+Without that file the release build still compiles, just unsigned, so a fresh clone
 never breaks. The keystore itself is never in this repository, and it should never be:
 anyone holding it can publish an update that Android will install over the real app.
 Losing it means every existing install has to be uninstalled and replaced by hand.
 
-`local.properties` is git-ignored too — it holds a machine-specific SDK path.
+`local.properties` is git-ignored too. It holds a machine-specific SDK path.
 
-Shipping a version — version bump, signing, checksums, the site update and the GitHub
-release — is documented step by step in [RELEASING.md](RELEASING.md).
+Shipping a version is documented step by step in [RELEASING.md](RELEASING.md): the version
+bump, signing, checksums, the site update and the GitHub release.
 
 ## Project structure
 
@@ -152,34 +152,34 @@ PdfBox-Android · Gson · JUnit.
 
 ## Changelog
 
-**0.6.2** — reader top bar reworked so Share and Settings stay fully visible; strict
+**0.6.2**: reader top bar reworked so Share and Settings stay fully visible; strict
 one-line ellipsis on book and chapter titles; bottom-origin slide-up when a book opens;
 motion timed to the highest supported refresh rate; Library is the destination for every
 fresh launch.
 
-**0.6.1** — durable exact TTS resume, restored sentence scrolled into view, unified
+**0.6.1**: durable exact TTS resume, restored sentence scrolled into view, unified
 motion and ripple polish.
 
-**0.6.0** — reader settings split into Page / TTS tabs; library detail typography
+**0.6.0**: reader settings split into Page / TTS tabs; library detail typography
 auto-sizes before it ellipsizes.
 
-**0.5.7** — Page and TTS settings separated, quarter-step font weight and pitch, details
+**0.5.7**: Page and TTS settings separated, quarter-step font weight and pitch, details
 sheet that adapts to locked font scale.
 
-**0.5.6** — hierarchical EPUB navigation, exact chapter anchors, paused TTS seeking,
+**0.5.6**: hierarchical EPUB navigation, exact chapter anchors, paused TTS seeking,
 synchronised chapter identity.
 
 ## Known limitations
 
 - Signed with a self-generated release key, not a Play Store key, so no store distribution.
 - Installing this build over an earlier debug-signed one requires an uninstall first.
-- EPUB and PDF only — no MOBI, AZW3 or CBZ.
+- EPUB and PDF only. No MOBI, AZW3 or CBZ.
 - TTS quality and available voices depend on the voices installed on the device.
 - No sync between devices; progress lives on the phone and in CSV backups.
 
 ## License
 
-No license file yet — all rights reserved for now. Open an issue if you'd like to use
+No license file yet, so all rights reserved for now. Open an issue if you'd like to use
 part of it and we'll sort something out.
 
 ---

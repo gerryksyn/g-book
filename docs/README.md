@@ -1,4 +1,4 @@
-# docs/ — the G-Book landing page
+# docs/: the G-Book landing page
 
 This folder is the published site. GitHub Pages serves it from `main` / `docs`.
 
@@ -6,7 +6,7 @@ This folder is the published site. GitHub Pages serves it from `main` / `docs`.
 
 ```
 docs/
-├── index.html      the whole page — inline CSS and JS, no build step
+├── index.html      the whole page: inline CSS and JS, no build step
 ├── .nojekyll       skip Jekyll processing
 ├── assets/
 │   ├── shots/      app screenshots (700px WebP)
@@ -18,18 +18,18 @@ docs/
 ## Editing
 
 Edit `index.html` directly and push to `main`. Pages rebuilds in under a minute. There is
-no framework, no npm install, no compile step — what you write is what ships.
+no framework, no npm install, no compile step. What you write is what ships.
 
 Keep paths relative (`assets/...`, not `/assets/...`) so the site keeps working under the
 `/g-book/` subpath.
 
 ## Things to keep intact
 
-- **`.nojekyll`** — without it, Jekyll eats files starting with an underscore.
+- **`.nojekyll`**: without it, Jekyll eats files starting with an underscore.
 - **The A / A+ / A++ text size control.** The audience is low-vision readers; the page has
   to be resizable.
 - **Alt text on every screenshot** and the skip link at the top of the body.
-- **`prefers-reduced-motion`** handling — the scroll reveals and the floating phone must
+- **`prefers-reduced-motion`** handling: the scroll reveals and the floating phone must
   stay switchable off.
 - **`docs/` must not be renamed.** Pages is configured to serve this folder.
 
