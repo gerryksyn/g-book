@@ -2,14 +2,18 @@
 
 An Android ebook reader that reads to you. Built for low vision, from the first line of code.
 
-**Landing page:** https://gerryksyn.github.io/g-book/ (once Pages is enabled)
+**Landing page:** https://gerryksyn.github.io/g-book/
+**Download:** [G-Book-v0.6.2-debug.apk](docs/assets/apk/G-Book-v0.6.2-debug.apk) · 24.2 MB · Android 8.0+
+
+<img src="docs/assets/shots/library.webp" width="200" alt="G-Book library screen"> <img src="docs/assets/shots/reader.webp" width="200" alt="G-Book reader with sentence highlight"> <img src="docs/assets/shots/stats.webp" width="200" alt="G-Book stats screen"> <img src="docs/assets/shots/share.webp" width="200" alt="G-Book share card">
 
 ---
 
 ## What it is
 
 G-Book is a native Android reading app with text-to-speech built in. Large type, real
-sentence highlighting, EPUB and PDF support, and nothing between you and the words.
+sentence-level highlighting, EPUB and PDF support, and nothing standing between you and
+the words.
 
 I have low vision, so this is the reader I actually needed — then kept rebuilding every
 time something got in the way of the words.
@@ -17,20 +21,34 @@ time something got in the way of the words.
 ## Features
 
 - **Reads aloud, properly.** TTS runs in a foreground service with a media session, so
-  playback survives screen-off and shows a notification with cover art, chapter, and
-  previous / play / next-sentence controls.
+  playback survives screen-off and shows a notification with cover art, book title,
+  chapter, and previous / play / next-sentence controls.
 - **Sentence-level highlight.** The spoken sentence is lit in light purple and kept in
-  view as the reader scrolls.
-- **Type you actually control.** 16–44sp, weight and line spacing in quarter increments,
-  serif or sans, centred or justified, one to three blank lines between paragraphs.
+  view as the reader auto-scrolls.
+- **Type you actually control.** 16–44sp, font weight and line spacing in quarter
+  increments, serif or sans, centred or justified, one to three blank lines between
+  paragraphs.
 - **True black, real contrast.** AMOLED-black surface by default, with an ink-on-paper
   high-contrast mode when you want the opposite.
 - **EPUB done right.** EPUB 3 navigation documents and EPUB 2 NCX both parse, the OPF
-  spine decides reading order, chapter anchors are exact.
-- **PDF, too.** Text is extracted for reading and speaking, first page rendered as cover.
-- **One source of progress.** Reader, library, stats, notification, shares and CSV backups
-  all read from the same model.
-- **Stats that count listening.** Today's spoken time, current book, reading days this month.
+  spine decides reading order, chapter anchors are exact, and malformed files still open.
+- **PDF, too.** Text is extracted for reading and speaking, with the first page rendered
+  as the cover.
+- **One source of progress.** Reader, library, stats, the notification, shared cards and
+  CSV backups all read from the same progress model.
+- **Stats that count listening.** Today's actual spoken time, the current book with
+  chapter and percentage, and reading days this month. CSV backup and restore.
+
+## Accessibility
+
+The reason the app exists, so it gets its own section:
+
+- Volume keys step sentence-by-sentence in full-screen reading instead of changing volume.
+- A tap hides all chrome so the page is only text; nothing overlaps the words.
+- The reader keeps its own locked type scale, so large sizes don't collapse the layout
+  into clipped lines.
+- Resumes on the exact sentence it left, scrolled into view.
+- Everything is real scalable type — nothing is a picture of text.
 
 ## Download
 
@@ -43,56 +61,96 @@ time something got in the way of the words.
 | Size | 24.2 MB |
 | SHA-256 | `d17f25f367662c17a5d282fcb9a2a8e70cb6bc9b0f90ad3a1b17796fab4b713d` |
 
-Grab `assets/apk/G-Book-v0.6.2-debug.apk` from this repo, or use the button on the
-landing page. The APK is debug-signed and distributed outside any app store, so Android
-will ask you to allow installs from this source.
+The APK is **debug-signed** and distributed outside any app store, so Android will ask
+you to allow installs from this source. Verify the SHA-256 if you want to be sure the
+file arrived intact. G-Book needs no account and no network to read.
 
-## Repo layout
+## Build from source
+
+Requires **JDK 17** and the Android SDK (compileSdk 34).
+
+```bash
+git clone https://github.com/gerryksyn/g-book.git
+cd g-book
+
+# point Gradle at your SDK
+echo "sdk.dir=$ANDROID_HOME" > local.properties
+
+./gradlew clean :app:testDebugUnitTest :app:assembleDebug
+```
+
+The APK lands in `app/build/outputs/apk/debug/app-debug.apk`.
+
+`local.properties` is git-ignored on purpose — it holds a machine-specific SDK path.
+
+## Project structure
 
 ```
 .
-├── index.html          the landing page (single file, no build step)
-├── assets/
-│   ├── shots/          app screenshots, 700px WebP
-│   ├── apk/            the signed debug APK + SHA256SUMS.txt
-│   └── icon-*.png      favicon and social preview
-├── .nojekyll           skip Jekyll processing on GitHub Pages
-└── README.md
+├── app/                        the Android application module
+│   └── src/
+│       ├── main/java/id/gerry/gbook/
+│       │   ├── MainActivity.kt          library host, navigation, volume keys
+│       │   ├── SplashActivity.kt        splash → main
+│       │   ├── GBookStore.kt            import, EPUB/PDF parsing, covers, persistence
+│       │   ├── Parsed.kt  Book.kt       models and text helpers
+│       │   ├── ChapterProgress.kt       progress model
+│       │   ├── EpubNavigationParser.kt  EPUB 3 nav + EPUB 2 NCX
+│       │   ├── ProgressBackup.kt        CSV backup and restore
+│       │   └── ui/
+│       │       ├── library/             grid/list, cover art, sort, menus
+│       │       ├── reader/              reader surface, TTS engine, playback service
+│       │       ├── share/               1080×1920 story card
+│       │       ├── stats/               today / current book / monthly
+│       │       └── theme/               AMOLED theme, motion
+│       └── test/java/id/gerry/gbook/    unit tests
+├── docs/                       the landing page, served by GitHub Pages
+├── build.gradle.kts
+├── settings.gradle.kts
+└── gradle.properties
 ```
 
-The page is plain HTML, CSS and a little vanilla JS. No framework, no dependencies,
-no build step. Edit `index.html` and push.
+Unit tests cover the parts that are easy to get wrong: EPUB navigation parsing, chapter
+progress maths, and the CSV backup format.
 
 ## Tech
 
-Kotlin · Jetpack Compose · Material 3 · MediaSessionCompat · PdfBox-Android · Gson ·
-JUnit. minSdk 26, targetSdk 34, JVM 17. Unit tests cover EPUB navigation parsing,
-chapter progress and the CSV backup format.
+Kotlin · Jetpack Compose · Material 3 · MediaSessionCompat (foreground TTS service) ·
+PdfBox-Android · Gson · JUnit.
 
-The Kotlin source lives outside this repo for now — this repo holds the page and the
-build. Say hi if you want the source.
+`minSdk 26` · `targetSdk 34` · `compileSdk 34` · JVM 17 · Compose BOM 2023.10.01.
 
 ## Changelog
 
-**0.6.2** — reader top bar reworked so Share and Settings stay fully visible; one-line
-ellipsis on titles; bottom-origin slide-up on book open; motion timed to the highest
-supported refresh rate; Library is the destination for every fresh launch.
+**0.6.2** — reader top bar reworked so Share and Settings stay fully visible; strict
+one-line ellipsis on book and chapter titles; bottom-origin slide-up when a book opens;
+motion timed to the highest supported refresh rate; Library is the destination for every
+fresh launch.
 
 **0.6.1** — durable exact TTS resume, restored sentence scrolled into view, unified
 motion and ripple polish.
 
 **0.6.0** — reader settings split into Page / TTS tabs; library detail typography
-auto-sizes before ellipsizing.
+auto-sizes before it ellipsizes.
 
-**0.5.7** — Page and TTS settings separated, quarter-step weight and pitch, details sheet
-adapts to locked font scale.
+**0.5.7** — Page and TTS settings separated, quarter-step font weight and pitch, details
+sheet that adapts to locked font scale.
 
-## Accessibility of the page itself
+**0.5.6** — hierarchical EPUB navigation, exact chapter anchors, paused TTS seeking,
+synchronised chapter identity.
 
-The landing page follows the same rules as the app: an A / A+ / A++ text size control that
-remembers your choice, a skip link, visible focus rings, real alt text on every
-screenshot, and `prefers-reduced-motion` support.
+## Known limitations
+
+- Debug-signed build. No release keystore yet, so no Play Store distribution.
+- EPUB and PDF only — no MOBI, AZW3 or CBZ.
+- TTS quality and available voices depend on the voices installed on the device.
+- No sync between devices; progress lives on the phone and in CSV backups.
+
+## License
+
+No license file yet — all rights reserved for now. Open an issue if you'd like to use
+part of it and we'll sort something out.
 
 ---
 
-A personal project by Gerry. Free to use, works offline, collects nothing.
+Made by [Gerry](https://github.com/gerryksyn). Free to use, works offline, collects nothing.

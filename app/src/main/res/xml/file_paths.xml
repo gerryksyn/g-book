@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FileProvider paths: grants other apps read access to generated share images
+     (and nothing else on this device). -->
+<paths>
+    <cache-path name="shared_images" path="share/" />
+</paths>
