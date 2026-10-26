@@ -1,0 +1,29 @@
+# ---- OS noise ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- editors ----
+.vscode/
+.idea/
+*.swp
+
+# ---- logs ----
+*.log
+
+# ---- local preview / tooling ----
+.preview/
+node_modules/
+
+# ---- Android (if the Gradle source is ever added) ----
+*.iml
+.gradle/
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+build/
+*.jks
+*.keystore
+
+# NOTE: *.apk is deliberately NOT ignored — the debug APK ships in assets/apk/

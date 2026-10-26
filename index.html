@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>G-Book — an ebook reader that reads to you</title>
+<meta name="description" content="G-Book is a low-vision-first Android ebook reader with built-in text-to-speech, sentence-level highlighting, and type you can actually size. EPUB and PDF. Free, offline, no accounts.">
+<meta name="theme-color" content="#050507">
+<link rel="icon" href="assets/icon-64.png" sizes="64x64">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="G-Book — an ebook reader that reads to you">
+<meta property="og:description" content="Built for low vision. Big type, real text-to-speech, sentence highlighting, EPUB + PDF. Free and offline.">
+<meta property="og:image" content="assets/icon-512.png">
+<script>document.documentElement.className += " js";</script>
+<style>
+  :root{
+    --bg:#050507;
+    --bg-2:#0a0910;
+    --ink:#F3EFFC;
+    --muted:#A79FB8;
+    --dim:#9E95B3;
+    --accent:#C9A9FF;
+    --accent-2:#8E6BF0;
+    --line:rgba(201,169,255,.15);
+    --card:rgba(255,255,255,.033);
+    --card-hi:rgba(255,255,255,.055);
+    --radius:20px;
+    --maxw:1120px;
+    --scale:1;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:var(--font);font-size:calc(16px * var(--scale));
+    line-height:1.65;-webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(58rem 40rem at 78% -8%, rgba(142,107,240,.20), transparent 62%),
+      radial-gradient(42rem 32rem at 8% 6%, rgba(201,169,255,.10), transparent 60%),
+      radial-gradient(48rem 36rem at 50% 108%, rgba(142,107,240,.13), transparent 65%);
+  }
+  .wrap{position:relative;z-index:1}
+  img{max-width:100%;height:auto;display:block}
+  a{color:inherit}
+  h1,h2,h3{line-height:1.14;letter-spacing:-.02em;margin:0}
+  p{margin:0}
+
+  .skip{
+    position:absolute;left:1rem;top:-4rem;z-index:99;background:var(--accent);color:#140b22;
+    padding:.7rem 1.1rem;border-radius:10px;font-weight:700;text-decoration:none;transition:top .2s;
+  }
+  .skip:focus{top:1rem}
+  :focus-visible{outline:2.5px solid var(--accent);outline-offset:3px;border-radius:6px}
+
+  /* ---------- nav ---------- */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:blur(18px) saturate(140%);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+    background:rgba(5,5,7,.72);border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .nav-in{
+    max-width:var(--maxw);margin:0 auto;padding:.75rem 1.4rem;
+    display:flex;align-items:center;gap:1rem;
+  }
+  .brand{display:flex;align-items:center;gap:.65rem;text-decoration:none;font-weight:750;letter-spacing:-.01em}
+  .brand img{width:32px;height:32px;border-radius:9px;border:1px solid var(--line)}
+  .brand span{font-size:1.05em}
+  .nav-links{display:flex;gap:.35rem;margin-left:auto;align-items:center}
+  .nav-links a{
+    text-decoration:none;color:var(--muted);font-size:.9em;font-weight:550;
+    padding:.45rem .7rem;border-radius:9px;transition:color .18s,background .18s;
+  }
+  .nav-links a:hover{color:var(--ink);background:rgba(255,255,255,.055)}
+  .type-toggle{
+    display:flex;gap:2px;margin-left:.5rem;padding:3px;border:1px solid var(--line);
+    border-radius:10px;background:rgba(255,255,255,.03);
+  }
+  .type-toggle button{
+    font:inherit;font-size:.78em;font-weight:700;color:var(--muted);
+    background:none;border:0;padding:.25rem .5rem;border-radius:7px;cursor:pointer;
+    transition:background .18s,color .18s;
+  }
+  .type-toggle button[aria-pressed="true"]{background:var(--accent);color:#170d26}
+  .type-toggle button:hover{color:var(--ink)}
+  .type-toggle button[aria-pressed="true"]:hover{color:#170d26}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+    padding:.72rem 1.15rem;border-radius:12px;text-decoration:none;font-weight:650;
+    font-size:.94em;border:1px solid transparent;transition:transform .16s,box-shadow .22s,background .2s,border-color .2s;
+    white-space:nowrap;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{
+    background:linear-gradient(180deg,#D6BAFF,#B995FF);color:#150c22;
+    box-shadow:0 10px 30px -12px rgba(201,169,255,.7),inset 0 1px 0 rgba(255,255,255,.45);
+  }
+  .btn-primary:hover{box-shadow:0 16px 40px -14px rgba(201,169,255,.85),inset 0 1px 0 rgba(255,255,255,.5)}
+  .btn-ghost{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.11);color:var(--ink)}
+  .btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(201,169,255,.35)}
+  .nav .btn{padding:.55rem .9rem;font-size:.88em}
+  .menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:.45rem .6rem;cursor:pointer}
+
+  /* ---------- hero ---------- */
+  .hero{
+    max-width:var(--maxw);margin:0 auto;padding:clamp(3rem,7vw,5.5rem) 1.4rem clamp(2rem,4vw,3rem);
+    display:grid;grid-template-columns:1.08fr .92fr;gap:clamp(2rem,5vw,4rem);align-items:center;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:.5rem;font-size:.78em;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--accent);
+    padding:.4rem .8rem;border:1px solid var(--line);border-radius:100px;
+    background:rgba(201,169,255,.07);
+  }
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+  h1{
+    font-size:clamp(2.5rem,5.6vw,4.15rem);font-weight:800;letter-spacing:-.035em;
+    margin:1.1rem 0 0;
+  }
+  h1 em{
+    font-style:normal;
+    background:linear-gradient(100deg,#E3D2FF 10%,#B995FF 55%,#8E6BF0 95%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .lede{color:var(--muted);font-size:1.09em;max-width:34rem;margin-top:1.15rem}
+  .cta{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.9rem}
+  .meta{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1.6rem}
+  .chip{
+    font-size:.79em;font-weight:600;color:var(--muted);
+    padding:.34rem .68rem;border:1px solid rgba(255,255,255,.09);
+    border-radius:100px;background:rgba(255,255,255,.03);
+  }
+  .chip b{color:var(--ink);font-weight:700}
+
+  /* ---------- phone ---------- */
+  .phone-wrap{display:flex;justify-content:center;position:relative}
+  .phone-wrap::after{
+    content:"";position:absolute;width:78%;aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle,rgba(142,107,240,.4),transparent 68%);
+    filter:blur(46px);z-index:0;
+  }
+  .phone{
+    position:relative;z-index:1;width:min(300px,80vw);
+    border-radius:34px;padding:9px;
+    background:linear-gradient(160deg,rgba(201,169,255,.32),rgba(255,255,255,.05) 40%,rgba(142,107,240,.22));
+    box-shadow:0 40px 90px -30px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.05);
+    animation:float 7s ease-in-out infinite;
+  }
+  .phone img{border-radius:26px;width:100%}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}
+  @media (prefers-reduced-motion:reduce){.phone{animation:none}}
+
+  /* ---------- sections ---------- */
+  section{max-width:var(--maxw);margin:0 auto;padding:clamp(3rem,6vw,5rem) 1.4rem}
+  .sec-head{max-width:44rem;margin-bottom:2.4rem}
+  .kicker{
+    font-size:.78em;font-weight:750;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:.7rem;display:block;
+  }
+  h2{font-size:clamp(1.75rem,3.4vw,2.6rem);font-weight:790;letter-spacing:-.03em}
+  .sec-head p{color:var(--muted);margin-top:.85rem;font-size:1.02em}
+
+  /* story */
+  .story{
+    display:grid;grid-template-columns:auto 1fr;gap:clamp(1.5rem,4vw,3rem);align-items:center;
+    border:1px solid var(--line);border-radius:calc(var(--radius) + 6px);
+    background:linear-gradient(150deg,rgba(201,169,255,.075),rgba(255,255,255,.018) 45%,transparent);
+    padding:clamp(1.6rem,3.5vw,2.8rem);
+  }
+  .story img{
+    width:118px;height:118px;object-fit:cover;border-radius:50%;
+    border:2px solid rgba(201,169,255,.4);box-shadow:0 0 0 6px rgba(201,169,255,.07);
+  }
+  .story blockquote{margin:0;font-size:clamp(1.05rem,2vw,1.32rem);line-height:1.55;font-weight:500;letter-spacing:-.01em}
+  .story cite{display:block;margin-top:1rem;font-style:normal;font-size:.86em;color:var(--dim);font-weight:600}
+
+  /* feature grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:.9rem}
+  .card{
+    position:relative;border:1px solid rgba(255,255,255,.075);border-radius:var(--radius);
+    background:var(--card);padding:1.4rem 1.35rem 1.45rem;
+    transition:border-color .22s,background .22s,transform .22s;
+    overflow:hidden;
+  }
+  .card::after{
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:radial-gradient(16rem 10rem at 12% 0%,rgba(201,169,255,.13),transparent 70%);
+    opacity:0;transition:opacity .28s;
+  }
+  .card:hover{border-color:rgba(201,169,255,.3);background:var(--card-hi);transform:translateY(-3px)}
+  .card:hover::after{opacity:1}
+  .ico{
+    width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+    background:rgba(201,169,255,.11);border:1px solid rgba(201,169,255,.22);
+    color:var(--accent);margin-bottom:1rem;
+  }
+  .ico svg{width:19px;height:19px}
+  .card h3{font-size:1.02em;font-weight:720;letter-spacing:-.012em}
+  .card p{color:var(--muted);font-size:.925em;margin-top:.5rem;line-height:1.6}
+
+  /* shots */
+  .shots{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+  .shot{margin:0;text-align:center}
+  .shot .frame{
+    border-radius:26px;padding:7px;border:1px solid rgba(255,255,255,.09);
+    background:linear-gradient(165deg,rgba(201,169,255,.16),rgba(255,255,255,.03));
+    transition:transform .3s,border-color .3s,box-shadow .3s;
+  }
+  .shot .frame img{border-radius:20px}
+  .shot:hover .frame{transform:translateY(-6px);border-color:rgba(201,169,255,.4);box-shadow:0 30px 60px -30px rgba(142,107,240,.6)}
+  .shot figcaption{font-size:.84em;color:var(--muted);margin-top:.85rem;line-height:1.45}
+  .shot figcaption b{display:block;color:var(--ink);font-weight:680;font-size:1.03em;margin-bottom:.15rem}
+
+  /* a11y list */
+  .a11y-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem 2.4rem}
+  .a11y-item{display:flex;gap:.85rem;padding:.85rem 0;border-bottom:1px solid rgba(255,255,255,.055)}
+  .a11y-item svg{flex:none;width:20px;height:20px;color:var(--accent);margin-top:.28rem}
+  .a11y-item h3{font-size:.98em;font-weight:680}
+  .a11y-item p{color:var(--muted);font-size:.9em;margin-top:.25rem}
+
+  /* stack */
+  .stack{display:flex;flex-wrap:wrap;gap:.55rem}
+  .tag{
+    font-size:.85em;font-weight:600;color:var(--ink);padding:.5rem .85rem;
+    border:1px solid rgba(255,255,255,.09);border-radius:11px;background:rgba(255,255,255,.035);
+  }
+  .tag span{color:var(--muted);font-weight:500}
+
+  /* download */
+  .dl-card{
+    border:1px solid rgba(201,169,255,.24);border-radius:calc(var(--radius) + 8px);
+    background:linear-gradient(155deg,rgba(201,169,255,.13),rgba(255,255,255,.02) 42%,rgba(142,107,240,.09));
+    padding:clamp(1.6rem,4vw,2.6rem);
+    display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(1.6rem,4vw,3rem);
+  }
+  .dl-card h2{font-size:clamp(1.5rem,2.8vw,2.1rem)}
+  .ver{display:flex;align-items:center;gap:.6rem;margin:.9rem 0 1.3rem;flex-wrap:wrap}
+  .badge{
+    font-size:.74em;font-weight:750;letter-spacing:.06em;text-transform:uppercase;
+    background:rgba(201,169,255,.16);color:var(--accent);border:1px solid rgba(201,169,255,.3);
+    padding:.24rem .55rem;border-radius:7px;
+  }
+  .specs{list-style:none;padding:0;margin:1.4rem 0 0;display:grid;gap:.55rem}
+  .specs li{display:flex;justify-content:space-between;gap:1rem;font-size:.9em;padding-bottom:.55rem;border-bottom:1px solid rgba(255,255,255,.06)}
+  .specs span{color:var(--muted)}
+  .specs b{font-weight:650}
+  .sha{
+    margin-top:1.3rem;font-size:.8em;color:var(--muted);
+  }
+  .sha code{
+    display:block;margin-top:.4rem;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.95em;color:var(--muted);word-break:break-all;line-height:1.5;
+  }
+  .steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:1rem}
+  .steps li{position:relative;padding-left:2.3rem;font-size:.92em;color:var(--muted)}
+  .steps li::before{
+    counter-increment:s;content:counter(s);
+    position:absolute;left:0;top:-.1rem;width:1.65rem;height:1.65rem;border-radius:50%;
+    display:grid;place-items:center;font-size:.8em;font-weight:750;
+    color:var(--accent);background:rgba(201,169,255,.12);border:1px solid rgba(201,169,255,.28);
+  }
+  .steps b{color:var(--ink);font-weight:650}
+  .note{
+    margin-top:1.5rem;font-size:.85em;color:var(--muted);line-height:1.65;
+    border-left:2px solid rgba(201,169,255,.35);padding-left:.9rem;
+  }
+
+  /* changelog */
+  .log{display:grid;gap:.1rem}
+  .log-item{
+    display:grid;grid-template-columns:130px 1fr;gap:1.6rem;
+    padding:1.15rem 0;border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .log-item h3{font-size:.95em;font-weight:720;color:var(--accent);font-variant-numeric:tabular-nums}
+  .log-item h3 small{display:block;font-size:.74em;font-weight:600;color:var(--muted);letter-spacing:.02em;margin-top:.2rem}
+  .log-item p{color:var(--muted);font-size:.92em}
+
+  /* footer */
+  footer{
+    border-top:1px solid rgba(255,255,255,.07);margin-top:2rem;
+    background:rgba(0,0,0,.35);
+  }
+  .foot{
+    max-width:var(--maxw);margin:0 auto;padding:2.6rem 1.4rem 3rem;
+    display:flex;flex-wrap:wrap;gap:1.6rem;align-items:center;justify-content:space-between;
+  }
+  .foot-brand{display:flex;align-items:center;gap:.7rem;font-weight:700}
+  .foot-brand img{width:28px;height:28px;border-radius:8px;border:1px solid var(--line)}
+  .foot p{color:var(--muted);font-size:.87em;max-width:32rem}
+  .foot-links{display:flex;gap:1.2rem;font-size:.86em}
+  .foot-links a{color:var(--muted);text-decoration:none}
+  .foot-links a:hover{color:var(--accent)}
+
+  /* reveal — only hidden when JS is actually running, so no-JS still shows everything */
+  .js .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.3,1),transform .7s cubic-bezier(.2,.7,.3,1)}
+  .js .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){
+    .js .reveal,.reveal{opacity:1;transform:none;transition:none}
+    html{scroll-behavior:auto}
+    *{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  }
+
+  /* responsive */
+  @media (max-width:980px){
+    .hero{grid-template-columns:1fr;text-align:left}
+    .phone-wrap{order:-1;margin-bottom:.5rem}
+    .phone{width:min(260px,64vw)}
+    .shots{grid-template-columns:repeat(2,1fr)}
+    .a11y-grid{grid-template-columns:1fr}
+    .dl-card{grid-template-columns:1fr}
+    .story{grid-template-columns:1fr;text-align:left}
+    .story img{width:88px;height:88px}
+  }
+  @media (max-width:720px){
+    .nav-links{
+      position:absolute;top:100%;left:0;right:0;
+      flex-direction:column;align-items:stretch;gap:.2rem;
+      padding:.8rem 1.1rem 1.1rem;
+      background:rgba(6,6,9,.97);border-bottom:1px solid var(--line);
+      display:none;
+    }
+    .nav-links.open{display:flex}
+    .nav-links a{padding:.7rem .8rem;font-size:1em}
+    .nav-links .btn{margin-top:.4rem}
+    .type-toggle{align-self:flex-start;margin:.4rem 0 0 .8rem}
+    .menu-btn{display:block;margin-left:auto}
+    .log-item{grid-template-columns:1fr;gap:.4rem}
+    .foot{flex-direction:column;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="wrap">
+
+  <header class="nav">
+    <div class="nav-in">
+      <a class="brand" href="#top">
+        <img src="assets/icon-64.png" alt="" width="32" height="32">
+        <span>G-Book</span>
+      </a>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <nav class="nav-links" id="navLinks" aria-label="Main">
+        <a href="#features">Features</a>
+        <a href="#screens">Screens</a>
+        <a href="#accessibility">Accessibility</a>
+        <a href="#download">Download</a>
+        <a href="#changelog">Changelog</a>
+        <div class="type-toggle" role="group" aria-label="Text size">
+          <button type="button" data-scale="1" aria-pressed="true">A</button>
+          <button type="button" data-scale="1.12" aria-pressed="false">A+</button>
+          <button type="button" data-scale="1.25" aria-pressed="false">A++</button>
+        </div>
+        <a class="btn btn-ghost" href="https://github.com/gerryksyn/g-book" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <section class="hero" id="top" style="padding-top:clamp(2.5rem,6vw,4.5rem)">
+      <div>
+        <span class="eyebrow"><span class="dot"></span>Android &middot; Kotlin &middot; Compose</span>
+        <h1>An ebook reader that <em>reads to you</em>.</h1>
+        <p class="lede">
+          G-Book was built for low vision, from the first line of code. Type you can size up to 44sp.
+          Real text-to-speech with sentence-by-sentence highlighting. EPUB and PDF. No accounts,
+          no ads, no network required to read.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="assets/apk/G-Book-v0.6.2-debug.apk" download>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16"/></svg>
+            Download APK &middot; v0.6.2
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/gerryksyn/g-book" rel="noopener">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.1-1.47-1.1-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.88 1.52 2.34 1.08 2.9.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.6 9.6 0 0 1 5 0c1.9-1.29 2.74-1.02 2.74-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>
+            Source
+          </a>
+        </div>
+        <div class="meta">
+          <span class="chip"><b>v0.6.2</b> &middot; code 21</span>
+          <span class="chip">Android <b>8.0+</b></span>
+          <span class="chip"><b>24 MB</b> &middot; offline</span>
+          <span class="chip">EPUB &middot; PDF</span>
+        </div>
+      </div>
+
+      <div class="phone-wrap">
+        <div class="phone">
+          <img src="assets/shots/reader.webp" width="700" height="1556"
+               alt="G-Book reading screen: large white text on pure black, with the current sentence highlighted in light purple and a play button below.">
+        </div>
+      </div>
+    </section>
+
+    <section style="padding-top:0">
+      <div class="story reveal">
+        <img src="assets/gerry.webp" width="118" height="118" alt="Gerry, the developer of G-Book.">
+        <div>
+          <blockquote>
+            &ldquo;I have low vision, so I built the reader I actually needed &mdash; then kept
+            rebuilding it every time something got in the way of the words.&rdquo;
+          </blockquote>
+          <cite>Gerry &mdash; maker of G-Book</cite>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="sec-head reveal">
+        <span class="kicker">Features</span>
+        <h2>Everything that matters when the text has to be readable</h2>
+        <p>Not a feature list for a store page. These are the things that were fixed, one version at a time, because they got in the way of reading.</p>
+      </div>
+
+      <div class="grid">
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6m4-9v12m4-14v16m4-12v8m4-5v2"/></svg></div>
+          <h3>Reads aloud, properly</h3>
+          <p>TTS runs in a foreground service with a media session, so playback survives screen-off and shows a notification with cover art, chapter, and previous / play / next-sentence controls.</p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h9M4 18h12"/><path d="M16 10l4 2-4 2z" fill="currentColor" stroke="none"/></svg></div>
+          <h3>Sentence-level highlight</h3>
+          <p>The spoken sentence is lit in light purple and kept in view as the reader scrolls. You always know exactly where the voice is &mdash; and where you are.</p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5h8v2M7 5v14M5 19h4"/><path d="M14 12h7M17.5 8v8M14.5 19h6"/></svg></div>
+          <h3>Type you actually control</h3>
+          <p>16 to 44sp in fine steps, weight and line spacing in quarter increments, serif or sans, centred or justified, one to three blank lines between paragraphs.</p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg></div>
+          <h3>True black, real contrast</h3>
+          <p>An AMOLED-black surface by default &mdash; kind to light-sensitive eyes and to your battery &mdash; with an ink-on-paper high-contrast mode when you want the opposite.</p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v17H6.5A2.5 2.5 0 0 0 4 22.5z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v17h4.5a2.5 2.5 0 0 1 2.5 2.5z"/></svg></div>
+          <h3>EPUB done right</h3>
+          <p>EPUB 3 navigation documents and EPUB 2 NCX both parse, the OPF spine decides reading order, chapter anchors are exact, and malformed files still open instead of failing.</p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M8.5 13h7M8.5 16.5h4.5"/></svg></div>
+          <h3>PDF, too</h3>
+          <p>Import a PDF and the text is extracted for reading and speaking, with the first page rendered as the cover so it looks like a book on your shelf.</p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></div>
+          <h3>One source of progress</h3>
+          <p>Reader, library, stats, the notification, shared cards and CSV backups all read from the same progress model. Nothing disagrees about where you are.</p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5m0 14h16"/><rect x="7" y="11" width="3.2" height="5" rx="1"/><rect x="12.4" y="8" width="3.2" height="8" rx="1"/><rect x="17.8" y="13" width="2.4" height="3" rx="1"/></svg></div>
+          <h3>Stats that count listening</h3>
+          <p>Today&rsquo;s actual spoken time, the current book with its chapter and percentage, and how many days this month you read. Backed up and restored as CSV.</p>
+        </article>
+
+        <article class="card reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="7" rx="1.6"/><rect x="13" y="4" width="8" height="7" rx="1.6"/><rect x="3" y="13" width="8" height="7" rx="1.6"/><path d="M17 14v5M14.5 16.5h5"/></svg></div>
+          <h3>A shelf that looks like yours</h3>
+          <p>Cover art is pulled out of the EPUB itself, or rendered from a PDF&rsquo;s first page, with a fallback if there is none. Grid or list, recency sort, long-press to manage.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="screens">
+      <div class="sec-head reveal">
+        <span class="kicker">Screens</span>
+        <h2>What it looks like in the hand</h2>
+        <p>Real screenshots from v0.6.2, not mockups.</p>
+      </div>
+      <div class="shots">
+        <figure class="shot reveal">
+          <div class="frame"><img src="assets/shots/library.webp" width="700" height="1556" loading="lazy"
+            alt="Library screen: a two-column grid of book covers under the heading My Library, with search, sort and menu icons, and a purple Import button."></div>
+          <figcaption><b>Library</b>Real cover art, grid or list, sorted by what you touched last.</figcaption>
+        </figure>
+        <figure class="shot reveal">
+          <div class="frame"><img src="assets/shots/reader.webp" width="700" height="1556" loading="lazy"
+            alt="Reader screen: oversized white text on black, the current sentence highlighted in light purple, chapter progress in the top bar and a play button at the bottom."></div>
+          <figcaption><b>Reader</b>Full-screen text, chrome hidden on tap, highlight following the voice.</figcaption>
+        </figure>
+        <figure class="shot reveal">
+          <div class="frame"><img src="assets/shots/stats.webp" width="700" height="1556" loading="lazy"
+            alt="Stats screen showing three cards: today's listening time, current book with a progress bar, and the number of reading days this month."></div>
+          <figcaption><b>Stats</b>Listening time, not taps. Today, current book, this month.</figcaption>
+        </figure>
+        <figure class="shot reveal">
+          <div class="frame"><img src="assets/shots/share.webp" width="700" height="1556" loading="lazy"
+            alt="Share sheet preview: a 1080 by 1920 story graphic with the book cover, 21 percent complete, a progress bar and the current chapter."></div>
+          <figcaption><b>Share</b>A 1080&times;1920 story card with cover, progress and chapter.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="accessibility">
+      <div class="sec-head reveal">
+        <span class="kicker">Accessibility</span>
+        <h2>Built from the eyes outward</h2>
+        <p>Low vision is not a settings toggle you add at the end. It shapes how the reader behaves &mdash; what is tappable, what is hidden, and how big the target is.</p>
+      </div>
+      <div class="a11y-grid">
+        <div class="a11y-item reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <div><h3>Volume keys move by sentence</h3><p>In full-screen reading, volume up and down step to the next and previous sentence instead of changing the device volume. No aiming at small buttons.</p></div>
+        </div>
+        <div class="a11y-item reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <div><h3>Tap anywhere to get out of the way</h3><p>A tap hides the chrome so the page is just text. The controls come back the same way &mdash; nothing is lost, nothing overlaps the words.</p></div>
+        </div>
+        <div class="a11y-item reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <div><h3>Fine-grained size, not three presets</h3><p>Text runs from 16sp to 44sp, weight and spacing in quarter steps. You can land on the size that is actually comfortable rather than the nearest one offered.</p></div>
+        </div>
+        <div class="a11y-item reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <div><h3>A type scale that never collapses</h3><p>The reader keeps its own locked scale, so a large size does not push the layout into clipped lines and broken paragraphs. Big text still has to be good layout.</p></div>
+        </div>
+        <div class="a11y-item reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <div><h3>Resume on the exact sentence</h3><p>Close the app mid-chapter and it reopens on the sentence it left, scrolled into view &mdash; not at the top of the chapter asking you to find your place again.</p></div>
+        </div>
+        <div class="a11y-item reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <div><h3>Text is text, never a picture of text</h3><p>Everything renders as real, scalable type. Nothing is a screenshot, so nothing blurs when you need it bigger.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="stack">
+      <div class="sec-head reveal">
+        <span class="kicker">Under the hood</span>
+        <h2>Native Android, no web view tricks</h2>
+        <p>A single-module Kotlin app with Jetpack Compose UI and unit tests around the parts that are easy to get wrong: navigation parsing, chapter progress, and backup format.</p>
+      </div>
+      <div class="stack reveal">
+        <span class="tag">Kotlin <span>&middot; JVM 17</span></span>
+        <span class="tag">Jetpack Compose <span>&middot; Material 3</span></span>
+        <span class="tag">MediaSessionCompat <span>&middot; foreground TTS service</span></span>
+        <span class="tag">PdfBox-Android <span>&middot; PdfRenderer</span></span>
+        <span class="tag">Gson <span>&middot; persistence</span></span>
+        <span class="tag">minSdk 26 <span>&middot; targetSdk 34</span></span>
+        <span class="tag">JUnit <span>&middot; unit tests</span></span>
+      </div>
+    </section>
+
+    <section id="download">
+      <div class="dl-card reveal">
+        <div>
+          <span class="kicker">Download</span>
+          <h2>Install it in a minute</h2>
+          <div class="ver">
+            <span class="badge">Latest</span>
+            <b>v0.6.2</b>
+            <span style="color:var(--muted);font-size:.9em">versionCode 21</span>
+          </div>
+          <a class="btn btn-primary" href="assets/apk/G-Book-v0.6.2-debug.apk" download>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16"/></svg>
+            Download G-Book-v0.6.2-debug.apk
+          </a>
+          <ul class="specs">
+            <li><span>File size</span><b>24.2 MB</b></li>
+            <li><span>Requires</span><b>Android 8.0 (API 26) or newer</b></li>
+            <li><span>Targets</span><b>Android 14 (API 34)</b></li>
+            <li><span>Package</span><b>id.gerry.gbook</b></li>
+          </ul>
+          <div class="sha">
+            SHA-256
+            <code>d17f25f367662c17a5d282fcb9a2a8e70cb6bc9b0f90ad3a1b17796fab4b713d</code>
+          </div>
+        </div>
+        <div>
+          <ol class="steps">
+            <li><b>Download the APK</b> on your phone, from this page or the GitHub release.</li>
+            <li><b>Allow installs from this source</b> when Android asks &mdash; Settings &rarr; Apps &rarr; Special access &rarr; Install unknown apps.</li>
+            <li><b>Open the file</b> and confirm. G-Book appears in your launcher as a black icon with a lavender G.</li>
+          </ol>
+          <p class="note">
+            The APK is debug-signed and distributed outside any app store, which is why Android shows
+            the warning. Verify the SHA-256 above if you want to be certain the file arrived intact.
+            G-Book asks for no account and no internet permission to read.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="changelog">
+      <div class="sec-head reveal">
+        <span class="kicker">Changelog</span>
+        <h2>Recent versions</h2>
+        <p>Each release fixed something specific that got in the way of reading.</p>
+      </div>
+      <div class="log">
+        <div class="log-item reveal">
+          <h3>v0.6.2<small>latest</small></h3>
+          <p>Reader top bar reworked so Share and Settings are always fully visible; strict one-line ellipsis on book and chapter titles; a smooth bottom-origin slide-up when a book opens; motion timed to the highest supported refresh rate; Library is now the destination for every fresh launch.</p>
+        </div>
+        <div class="log-item reveal">
+          <h3>v0.6.1</h3>
+          <p>Durable exact TTS resume, the restored sentence scrolled back into view, and unified motion and ripple polish across the app.</p>
+        </div>
+        <div class="log-item reveal">
+          <h3>v0.6.0</h3>
+          <p>Reader settings reorganised into top tabs for Page and TTS; library detail typography now auto-sizes before it ellipsizes.</p>
+        </div>
+        <div class="log-item reveal">
+          <h3>v0.5.7</h3>
+          <p>Page and TTS settings separated, quarter-step font weight and pitch controls, and a details sheet that adapts to locked font scale.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="foot">
+      <div>
+        <div class="foot-brand">
+          <img src="assets/icon-64.png" alt="" width="28" height="28">
+          <span>G-Book</span>
+        </div>
+        <p style="margin-top:.7rem">A personal Android project by Gerry. Free to use, works offline, collects nothing.</p>
+      </div>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="#download">Download</a>
+        <a href="#changelog">Changelog</a>
+        <a href="https://github.com/gerryksyn/g-book" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---- text size preference ---- */
+  var root = document.documentElement;
+  var buttons = Array.prototype.slice.call(document.querySelectorAll(".type-toggle button"));
+  var saved = null;
+  try { saved = localStorage.getItem("gbook-scale"); } catch (e) {}
+
+  function applyScale(value) {
+    root.style.setProperty("--scale", value);
+    buttons.forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.scale === value));
+    });
+    try { localStorage.setItem("gbook-scale", value); } catch (e) {}
+  }
+  if (saved) { applyScale(saved); }
+  buttons.forEach(function (b) {
+    b.addEventListener("click", function () { applyScale(b.dataset.scale); });
+  });
+
+  /* ---- mobile menu ---- */
+  var menuBtn = document.getElementById("menuBtn");
+  var navLinks = document.getElementById("navLinks");
+  if (menuBtn && navLinks) {
+    menuBtn.addEventListener("click", function () {
+      var open = navLinks.classList.toggle("open");
+      menuBtn.setAttribute("aria-expanded", String(open));
+    });
+    navLinks.addEventListener("click", function (e) {
+      if (e.target.tagName === "A" && navLinks.classList.contains("open")) {
+        navLinks.classList.remove("open");
+        menuBtn.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  /* ---- scroll reveal ---- */
+  var items = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reduce || !("IntersectionObserver" in window)) {
+    items.forEach(function (el) { el.classList.add("in"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry, i) {
+        if (!entry.isIntersecting) return;
+        var el = entry.target;
+        el.style.transitionDelay = Math.min(i * 70, 240) + "ms";
+        el.classList.add("in");
+        io.unobserve(el);
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+
+    /* Anything already on screen at load shows immediately; the rest reveals on scroll.
+       This also covers the case where the observer never fires. */
+    items.forEach(function (el) {
+      var box = el.getBoundingClientRect();
+      if (box.top < window.innerHeight * 0.92 && box.bottom > 0) {
+        el.classList.add("in");
+      } else {
+        io.observe(el);
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>

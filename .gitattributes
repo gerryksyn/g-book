@@ -1,0 +1,8 @@
+# Normalise line endings so the page is identical on every machine
+* text=auto eol=lf
+
+# Binaries — never touch these
+*.apk   binary
+*.png   binary
+*.webp  binary
+*.jpg   binary
